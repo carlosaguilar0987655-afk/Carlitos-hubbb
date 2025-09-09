@@ -1,0 +1,193 @@
+-- Script similar a Chilli Hub para Steal a Brainrot
+
+-- Clave de activación
+local activationKey = "TU_CLAVE_DE_ACTIVACION_AQUI"
+
+-- Función para verificar la clave de activación
+local function verifyActivationKey(key)
+    return key == activationKey
+end
+
+-- Crear la interfaz de usuario
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 250, 0, 200)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -100)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.Parent = ScreenGui
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Text = "Steal a Brainrot Hub"
+Title.TextSize = 20
+Title.Parent = MainFrame
+
+local InvisibilityToggle = Instance.new("TextButton")
+InvisibilityToggle.Size = UDim2.new(1, 0, 0, 30)
+InvisibilityToggle.Position = UDim2.new(0, 0, 0, 40)
+InvisibilityToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+InvisibilityToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+InvisibilityToggle.Text = "Toggle Invisibility"
+InvisibilityToggle.Parent = MainFrame
+
+local CollectCashToggle = Instance.new("TextButton")
+CollectCashToggle.Size = UDim2.new(1, 0, 0, 30)
+CollectCashToggle.Position = UDim2.new(0, 0, 0, 80)
+CollectCashToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CollectCashToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+CollectCashToggle.Text = "Toggle Collect Cash"
+CollectCashToggle.Parent = MainFrame
+
+local LockBaseToggle = Instance.new("TextButton")
+LockBaseToggle.Size = UDim2.new(1, 0, 0, 30)
+LockBaseToggle.Position = UDim2.new(0, 0, 0, 120)
+LockBaseToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+LockBaseToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+LockBaseToggle.Text = "Toggle Lock Base"
+LockBaseToggle.Parent = MainFrame
+
+local StealBrainrotsToggle = Instance.new("TextButton")
+StealBrainrotsToggle.Size = UDim2.new(1, 0, 0, 30)
+StealBrainrotsToggle.Position = UDim2.new(0, 0, 0, 160)
+StealBrainrotsToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+StealBrainrotsToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+StealBrainrotsToggle.Text = "Toggle Steal Brainrots"
+StealBrainrotsToggle.Parent = MainFrame
+
+-- Función para hacer al jugador invisible
+local function makePlayerInvisible()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        for _, part in ipairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Transparency = 1
+                part.CanCollide = false
+            end
+        end
+    end
+end
+
+-- Función para hacer al jugador visible
+local function makePlayerVisible()
+    local character = game.Players.LocalPlayer.Character
+    if character then
+        for _, part in ipairs(character:GetChildren()) do
+            if part:IsA("BasePart") then
+                part.Transparency = 0
+                part.CanCollide = true
+            end
+        end
+    end
+end
+
+-- Función para recoger dinero automáticamente
+local function collectCash()
+    while true do
+        for _, cash in ipairs(workspace:GetChildren()) do
+            if cash.Name == "Money" then -- Ajusta el nombre del objeto de dinero
+                local distance = (cash.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                if distance < 15 then -- Ajusta el radio de recolección
+                    cash:Destroy() -- Simula la recolección de dinero
+                    wait(0.2) -- Ajusta el tiempo de espera
+                end
+            end
+        end
+        wait(0.2) -- Ajusta el tiempo de espera entre intentos
+    end
+end
+
+-- Función para bloquear la base automáticamente
+local function autoLockBase()
+    while true do
+        local base = game.Players.LocalPlayer:FindFirstChild("MyBase") -- Ajusta el nombre del objeto de la base
+        if base then
+            base.Locked = true -- Bloquea la base
+            wait(2) -- Ajusta el tiempo de espera
+        end
+        wait(2) -- Ajusta el tiempo de espera entre intentos
+    end
+end
+
+-- Función para robar Brainrots automáticamente
+local function stealBrainrots()
+    while true do
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                local brainrot = player:FindFirstChild("Brainrot") -- Ajusta el nombre del objeto Brainrot
+                if brainrot then
+                    local distance = (brainrot.Position - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+                    if distance < 15 then -- Ajusta el radio de robo
+                        brainrot:Destroy() -- Simula el robo del Brainrot
+                        wait(0.2) -- Ajusta el tiempo de espera
+                    end
+                end
+            end
+        end
+        wait(0.5) -- Ajusta el tiempo de espera entre ciclos de robo
+    end
+end
+
+-- Variables para rastrear el estado de las funcionalidades
+local isInvisible = false
+local isCollectingCash = false
+local isLockingBase = false
+local isStealingBrainrots = false
+
+-- Función para manejar los botones de la UI
+local function onButtonClicked(buttonName)
+    if buttonName == "Invisibility" then
+        isInvisible = not isInvisible
+        if isInvisible then
+            makePlayerInvisible()
+        else
+            makePlayerVisible()
+        end
+    elseif buttonName == "CollectCash" then
+        isCollectingCash = not isCollectingCash
+        if isCollectingCash then
+            coroutine.wrap(collectCash)()
+        end
+    elseif buttonName == "LockBase" then
+        isLockingBase = not isLockingBase
+        if isLockingBase then
+            coroutine.wrap(autoLockBase)()
+        end
+    elseif buttonName == "StealBrainrots" then
+        isStealingBrainrots = not isStealingBrainrots
+        if isStealingBrainrots then
+            coroutine.wrap(stealBrainrots)()
+        end
+    end
+end
+
+-- Conectar los botones a sus respectivas funciones
+InvisibilityToggle.MouseButton1Click:Connect(function()
+    onButtonClicked("Invisibility")
+end)
+
+CollectCashToggle.MouseButton1Click:Connect(function()
+    onButtonClicked("CollectCash")
+end)
+
+LockBaseToggle.MouseButton1Click:Connect(function()
+    onButtonClicked("LockBase")
+end)
+
+StealBrainrotsToggle.MouseButton1Click:Connect(function()
+    onButtonClicked("StealBrainrots")
+end)
+
+-- Verificar la clave de activación
+print("Introduce la clave de activación:")
+local userInput = game:GetService("Players").LocalPlayer:Prompt("Introduce la clave de activación:")
+if verifyActivationKey(userInput) then
+    print("Clave de activación válida. El menú de mod está activo.")
+else
+    print("Clave de activación inválida. El menú de mod no se activará.")
+    ScreenGui:Destroy()
+end
